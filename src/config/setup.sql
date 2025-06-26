@@ -1,0 +1,49 @@
+-- Create the database
+CREATE DATABASE IF NOT EXISTS chat_ia;
+USE chat_ia;
+
+-- Users table
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Documents table
+CREATE TABLE IF NOT EXISTS documents (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    file_path VARCHAR(255) NOT NULL,
+    content TEXT,
+    user_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Chat messages table
+CREATE TABLE IF NOT EXISTS chat_messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    message TEXT NOT NULL,
+    is_bot BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Chat sessions table
+CREATE TABLE IF NOT EXISTS chat_sessions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    title VARCHAR(100) DEFAULT 'New Chat',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Link messages to sessions
+ALTER TABLE chat_messages ADD COLUMN session_id INT;
+ALTER TABLE chat_messages ADD CONSTRAINT fk_session FOREIGN KEY (session_id) REFERENCES chat_sessions(id) ON DELETE CASCADE;

@@ -1,0 +1,10 @@
+RewriteEngine On
+RewriteBase /
+
+# Handle API requests
+RewriteRule ^api/(.*)$ src/api.php [L]
+
+# Handle all other requests as frontend routes
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [L,QSA]
